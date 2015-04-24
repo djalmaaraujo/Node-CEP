@@ -1,10 +1,14 @@
 /*jslint node: true */
 "use strict";
 
-var express = require('express'),
-    request = require('request'),
-    cheerio = require('cheerio'),
-    router  = express.Router();
+var express     = require('express'),
+    request     = require('request'),
+    cheerio     = require('cheerio'),
+    router      = express.Router(),
+    rtg         = require("url").parse(process.env.REDISTOGO_URL),
+    redisClient = require("redis").createClient(rtg.port, rtg.hostname);
+
+redisClient.auth(rtg.auth.split(":")[1]);
 
 function getAddress(answers) {
     return {
@@ -15,8 +19,9 @@ function getAddress(answers) {
     };
 }
 
-router.get('/:cep', function (req, res) {
-    var data = 'cepEntrada=' + req.params.cep + '&metodo=buscarCep';
+function requestCep (req, res, cb) {
+    var cep  = req.params.cep;
+    var data = 'cepEntrada=' + cep + '&metodo=buscarCep';
 
     request({
         'url': 'http://m.correios.com.br/movel/buscaCepConfirma.do',
@@ -46,13 +51,28 @@ router.get('/:cep', function (req, res) {
                     message: error.text().trim()
                 };
 
-                res.send(JSON.stringify(cepError));
+                cb(JSON.stringify(cepError));
             } else {
                 answers = $('.respostadestaque');
-                address = getAddress(answers);
+                address = JSON.stringify(getAddress(answers));
 
-                res.send(JSON.stringify(address));
+                redisClient.set(cep, address);
+                cb(address);
             }
+        }
+    });
+}
+
+router.get('/:cep', function (req, res) {
+    redisClient.get(req.params.cep, function (err, cep) {
+        var data = JSON.parse(cep);
+
+        if (data && err === null && data.hasOwnProperty('logradouro')) {
+            res.send(data)
+        } else {
+            requestCep(req, res, function (json) {
+                res.send(json);
+            });
         }
     });
 });
