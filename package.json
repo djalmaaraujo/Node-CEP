@@ -10,6 +10,9 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "nodemon app.js"
     },
+    "engines": {
+        "node": "0.12.2"
+    },
     "dependencies": {
         "express": "~4.12.3",
         "request": "~2.55.0",
