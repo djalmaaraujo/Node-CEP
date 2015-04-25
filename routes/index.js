@@ -33,11 +33,7 @@ function getAddress(answers) {
 }
 
 function parseResponse(data) {
-    var address = "var WS_CEP_RESULT = {";
-    address += data;
-    address += "};";
-
-    return address;
+    return "var WS_CEP_RESULT = " + data + ";";
 }
 
 function requestCep (req, res, cb) {
