@@ -69,7 +69,7 @@ function requestCep (req, res, cb) {
                 };
 
                 console.log('ta vindo aqui');
-                cb('{"error": true'});
+                cb('{"error": true}');
             } else {
                 answers = $('.respostadestaque');
                 address = JSON.stringify(getAddress(answers));
