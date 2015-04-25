@@ -1,6 +1,19 @@
 /*jslint node: true */
 "use strict";
 
+/*
+var resultadoCEP = {
+    'uf'                : 'SP',
+    'cidade'            : 'Jacareí',
+    'bairro'            : 'Cidade Salvador',
+    'tipo_logradouro'   : 'Rua',
+    'logradouro'        : 'Mabito Shoji',
+    'resultado'         : '1',
+    'resultado_txt'     : 'sucesso - cep completo'
+}
+*/
+
+
 var express     = require('express'),
     request     = require('request'),
     cheerio     = require('cheerio'),
@@ -17,6 +30,14 @@ function getAddress(answers) {
         localidade: answers.eq(2).text().trim().split('/')[0].trim(),
         uf:         answers.eq(2).text().trim().split('/')[1].trim()
     };
+}
+
+function parseResponse(data) {
+    var address = "var WS_CEP_RESULT = {";
+    address += data;
+    address += "};";
+
+    return address;
 }
 
 function requestCep (req, res, cb) {
@@ -68,10 +89,10 @@ router.get('/:cep', function (req, res) {
         var data = JSON.parse(cep);
 
         if (data && err === null && data.hasOwnProperty('logradouro')) {
-            res.send(data)
+            res.send(parseResponse(cep))
         } else {
             requestCep(req, res, function (json) {
-                res.send(json);
+                res.send(parseResponse(cep));
             });
         }
     });
