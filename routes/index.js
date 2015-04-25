@@ -72,7 +72,8 @@ function requestCep (req, res, cb) {
                     message: error.text().trim()
                 };
 
-                cb(JSON.stringify(cepError));
+                console.log('ta vindo aqui');
+                cb('error: true');
             } else {
                 answers = $('.respostadestaque');
                 address = JSON.stringify(getAddress(answers));
@@ -91,8 +92,8 @@ router.get('/:cep', function (req, res) {
         if (data && err === null && data.hasOwnProperty('logradouro')) {
             res.send(parseResponse(cep))
         } else {
-            requestCep(req, res, function (json) {
-                res.send(parseResponse(cep));
+            requestCep(req, res, function (response) {
+                res.send(parseResponse(response));
             });
         }
     });
