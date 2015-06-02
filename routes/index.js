@@ -25,10 +25,10 @@ redisClient.auth(rtg.auth.split(":")[1]);
 
 function getAddress(answers) {
     return {
-        logradouro: answers.eq(0).text().trim(),
-        bairro:     answers.eq(1).text().trim(),
-        localidade: answers.eq(2).text().trim().split('/')[0].trim(),
-        uf:         answers.eq(2).text().trim().split('/')[1].trim()
+        logradouro: (answers.eq(0).toString() !== '') ? answers.eq(0).text().trim() : '',
+        bairro:     (answers.eq(1).toString() !== '') ? answers.eq(1).text().trim() : '',
+        localidade: (answers.eq(2).toString() !== '') ? answers.eq(2).text().trim().split('/')[0].trim() : '',
+        uf:         (answers.eq(2).toString() !== '') ? answers.eq(2).text().trim().split('/')[1].trim() : ''
     };
 }
 
@@ -68,7 +68,6 @@ function requestCep (req, res, cb) {
                     message: error.text().trim()
                 };
 
-                console.log('ta vindo aqui');
                 cb('{"error": true}');
             } else {
                 answers = $('.respostadestaque');
